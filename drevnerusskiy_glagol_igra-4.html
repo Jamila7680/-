@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Древнерусский глагол — интерактивная игра</title>
+<style>
+:root{--ink:#2d1b12;--brown:#57351f;--gold:#d7a85c;--paper:#f6e8c9;--cream:#fff8e9;--red:#8e3527;--green:#326b49}
+*{box-sizing:border-box}body{margin:0;color:var(--ink);font-family:Georgia,"Times New Roman",serif;background:radial-gradient(circle at 20% 10%,#806044,#24170f 75%);min-height:100vh}
+button,input{font:inherit}button{cursor:pointer;border:0}
+.app{max-width:1180px;margin:auto;padding:22px}
+header{display:flex;align-items:center;justify-content:space-between;gap:16px;color:#f9e9c8;margin-bottom:16px}
+.brand{font-size:clamp(22px,3vw,38px);font-weight:bold;letter-spacing:.03em;text-shadow:0 2px 3px #000}
+.brand small{display:block;font-size:13px;font-weight:normal;letter-spacing:.15em;color:#e2c28c;margin-top:5px}
+.top-actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{padding:11px 17px;border-radius:12px;background:linear-gradient(#f8dfaa,#d5a45c);color:#392113;font-weight:bold;border:1px solid #8b5a2b;box-shadow:0 3px 0 #75431f;transition:.15s}
+.btn:hover{filter:brightness(1.08);transform:translateY(-1px)}.btn:active{transform:translateY(2px);box-shadow:none}
+.btn.dark{background:linear-gradient(#70482d,#3e2618);color:#fff0d2;border-color:#bd8b4b}
+.btn.ghost{background:#fff7e5;color:#49301d;box-shadow:none}
+.shell{background:var(--paper);border:8px ridge #a8783c;border-radius:20px;box-shadow:0 18px 55px #0008;overflow:hidden}
+.hero{padding:clamp(24px,5vw,58px);text-align:center;background:linear-gradient(135deg,#f9edcf,#e8c991);position:relative}
+.hero:before,.hero:after{content:"✦ ❧ ✦ ❧ ✦";display:block;color:#9b6937;letter-spacing:.5em;font-size:18px}
+h1{font-size:clamp(34px,6vw,68px);margin:18px 0 8px;color:#542b18;text-shadow:1px 2px #fff}
+.subtitle{font-size:clamp(16px,2vw,22px);color:#704a2b;margin:0 auto 24px;max-width:720px}
+.seal{display:inline-flex;border:2px solid #9a642e;border-radius:50%;width:92px;height:92px;align-items:center;justify-content:center;font-size:43px;margin:10px;background:#f4dcae;box-shadow:inset 0 0 0 5px #e8c58b}
+.menu{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:22px}
+.game-card{background:linear-gradient(145deg,#fff7e5,#e8d0a3);border:2px solid #b78343;border-radius:15px;padding:20px;text-align:left;min-height:175px;box-shadow:0 4px 0 #bd955f}
+.game-card .emoji{font-size:35px}.game-card h3{margin:8px 0;color:#5a321d;font-size:22px}.game-card p{margin:0 0 15px;color:#6d5035;line-height:1.4}
+.game-card button{width:100%}
+.panel{padding:clamp(18px,3vw,34px);background:linear-gradient(#f9edcf,#f0dcb5);min-height:440px}
+.panel-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;border-bottom:2px solid #c59a5d;padding-bottom:15px;margin-bottom:20px}
+.kicker{font-size:13px;text-transform:uppercase;letter-spacing:.15em;color:#8a5b30}
+h2{margin:5px 0;color:#512d1b;font-size:clamp(25px,3.4vw,38px)}
+.stat{background:#57351f;color:#ffebc6;padding:9px 14px;border-radius:10px;font-weight:bold}
+.progress{height:10px;background:#d5bd91;border-radius:20px;overflow:hidden;margin:15px 0 23px}.progress span{display:block;height:100%;background:linear-gradient(90deg,#9b542a,#e2b45e);width:0;transition:.3s}
+.question{font-size:clamp(23px,3vw,34px);text-align:center;line-height:1.3;margin:26px auto;max-width:850px;color:#392317}
+.options{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;max-width:850px;margin:0 auto}
+.option{padding:17px;border-radius:12px;border:2px solid #b9894b;background:#fff8e9;color:#422919;font-size:19px;font-weight:bold;min-height:65px}
+.option:hover{background:#f4dfb8}.option.selected{background:#ead09d;border-color:#77431e}.option.correct{background:#d6ead6;border-color:#438454}.option.wrong{background:#f3d4cc;border-color:#a34c3d}
+.feedback{max-width:850px;margin:18px auto 0;padding:15px;border-radius:12px;background:#fff8e9;border-left:5px solid var(--gold);font-size:17px;line-height:1.45}
+.controls{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:22px}
+.hidden{display:none!important}
+.teamsetup{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;max-width:750px;margin:20px auto}
+.team{padding:18px;background:#fff6e3;border:2px solid #c59a5d;border-radius:13px}
+.team input{width:100%;padding:12px;border:1px solid #b9894b;border-radius:8px;margin-top:8px;background:white;color:#392317}
+.scoreboard{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin:20px 0}
+.score{padding:20px;border-radius:14px;background:#57351f;color:#ffedca;text-align:center}
+.score strong{display:block;font-size:36px;color:#f3c879;margin-top:7px}
+.result{text-align:center;padding:35px 10px}.result .big{font-size:64px}.result h2{font-size:40px}
+footer{text-align:center;color:#e6c99c;padding:15px;font-size:13px}
+@media(max-width:760px){.menu{grid-template-columns:1fr}.options{grid-template-columns:1fr}.teamsetup,.scoreboard{grid-template-columns:1fr}.app{padding:10px}.shell{border-width:5px}header{align-items:flex-start;flex-direction:column}}
+@media (min-width:1000px){body.projector .app{max-width:1500px}body.projector .question{font-size:42px}body.projector .option{font-size:25px;padding:23px}body.projector .panel{min-height:650px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+ <div class="brand">✦ ДРЕВНЕРУССКИЙ ГЛАГОЛ <small>ИСТОРИЯ РУССКОГО ЯЗЫКА · ИНТЕРАКТИВНЫЙ КВЕСТ</small></div>
+ <div class="top-actions">
+  <button class="btn dark" onclick="toggleProjector()">⛶ Режим проектора</button>
+  <button class="btn dark" onclick="toggleSound()" id="soundBtn">♫ Звук: выкл.</button>
+  <button class="btn dark" onclick="goHome()">⌂ На главную</button>
+ </div>
+</header>
+<div class="shell">
+<section id="home">
+ <div class="hero">
+  <div class="seal">📜</div>
+  <h1>Тайны древнерусского глагола</h1>
+  <p class="subtitle">Историческое путешествие: разгадывай формы, открывай грамматические тайны и набирай баллы!</p>
+  <button class="btn" onclick="show('games')">Начать путешествие →</button>
+ </div>
+ <div class="menu">
+  <article class="game-card"><div class="emoji">⌛</div><h3>Охота за временами</h3><p>Аорист, имперфект, перфект и их значения.</p><button class="btn" onclick="startGame('times')">Играть</button></article>
+  <article class="game-card"><div class="emoji">🔎</div><h3>Лингвистический детектив</h3><p>Разбери древнерусские формы и найди их признаки.</p><button class="btn" onclick="startGame('detective')">Играть</button></article>
+  <article class="game-card"><div class="emoji">⚖️</div><h3>Верю — не верю</h3><p>Проверь исторические утверждения и докажи свою правоту.</p><button class="btn" onclick="startGame('truth')">Играть</button></article>
+  <article class="game-card"><div class="emoji">🏰</div><h3>Командная битва</h3><p>Две команды соревнуются на большом экране.</p><button class="btn" onclick="show('teams')">Настроить команды</button></article>
+  <article class="game-card"><div class="emoji">📚</div><h3>Шпаргалка летописца</h3><p>Краткое повторение основных понятий перед игрой.</p><button class="btn" onclick="show('cheat')">Открыть справочник</button></article>
+  <article class="game-card"><div class="emoji">🏆</div><h3>Итоги занятия</h3><p>Узнай результат своего игрового раунда.</p><button class="btn" onclick="show('scores')">Таблица баллов</button></article>
+ </div>
+</section>
+<section id="games" class="panel hidden">
+ <div class="panel-head"><div><div class="kicker">Выбери испытание</div><h2>Игровая карта</h2></div><button class="btn ghost" onclick="goHome()">← Назад</button></div>
+ <div class="menu" style="padding:0">
+  <article class="game-card"><div class="emoji">⌛</div><h3>Охота за временами</h3><p>Определи временную форму.</p><button class="btn" onclick="startGame('times')">Начать</button></article>
+  <article class="game-card"><div class="emoji">🔎</div><h3>Лингвистический детектив</h3><p>Найди грамматические характеристики.</p><button class="btn" onclick="startGame('detective')">Начать</button></article>
+  <article class="game-card"><div class="emoji">⚖️</div><h3>Верю — не верю</h3><p>Оцени исторические факты.</p><button class="btn" onclick="startGame('truth')">Начать</button></article>
+ </div>
+</section>
+<section id="play" class="panel hidden">
+ <div class="panel-head"><div><div class="kicker" id="gameLabel">Испытание</div><h2 id="gameTitle">Игра</h2></div><div class="stat" id="scoreNow">Баллы: 0</div></div>
+ <div class="progress"><span id="bar"></span></div>
+ <div class="kicker" id="counter">Вопрос 1 из 5</div>
+ <div class="question" id="question"></div>
+ <div class="options" id="options"></div>
+ <div id="feedback" class="feedback hidden"></div>
+ <div class="controls"><button class="btn ghost" onclick="goHome()">Выйти</button><button class="btn" id="nextBtn" onclick="nextQuestion()" disabled>Ответить / Далее →</button></div>
+</section>
+<section id="teams" class="panel hidden">
+ <div class="panel-head"><div><div class="kicker">Режим преподавателя</div><h2>Командная битва</h2></div><button class="btn ghost" onclick="goHome()">← Назад</button></div>
+ <p style="text-align:center;font-size:19px">Введите названия команд. После каждого вопроса ведущий может начислить балл команде, давшей правильный ответ.</p>
+ <div class="teamsetup"><div class="team">🛡️ Команда 1<input id="team1" value="Летописцы"></div><div class="team">⚔️ Команда 2<input id="team2" value="Грамматисты"></div></div>
+ <div class="scoreboard"><div class="score"><span id="name1">Летописцы</span><strong id="points1">0</strong><button class="btn" onclick="addTeam(1)">+1 балл</button></div><div class="score"><span id="name2">Грамматисты</span><strong id="points2">0</strong><button class="btn" onclick="addTeam(2)">+1 балл</button></div></div>
+ <div style="text-align:center"><button class="btn" onclick="updateTeams()">Обновить названия</button> <button class="btn dark" onclick="resetTeams()">Сбросить счёт</button></div>
+</section>
+<section id="cheat" class="panel hidden">
+ <div class="panel-head"><div><div class="kicker">Памятка</div><h2>Шпаргалка летописца</h2></div><button class="btn ghost" onclick="goHome()">← Назад</button></div>
+ <div class="feedback"><b>Аорист</b> — форма прошедшего времени, представлявшая действие как целостный факт.</div>
+ <div class="feedback"><b>Имперфект</b> — форма прошедшего времени для длительного, повторяющегося или незавершённого действия.</div>
+ <div class="feedback"><b>Перфект</b> — аналитическая форма: причастие на -л в сочетании с формами настоящего времени глагола быти.</div>
+ <div class="feedback"><b>Двойственное число</b> — грамматическое число, обозначавшее два предмета или участника; сохранялось и в древнерусских глагольных формах.</div>
+ <div class="feedback"><b>Инфинитив</b> — неопределённая форма глагола; характерный древнерусский показатель — -ти (нести, вести, ходити).</div>
+</section>
+<section id="scores" class="panel hidden">
+ <div class="result"><div class="big">🏆</div><h2>Итоги занятия</h2><p id="finalScore" style="font-size:22px">Пока нет завершённых раундов.</p><button class="btn" onclick="goHome()">Вернуться к играм</button></div>
+</section>
+<section id="finish" class="panel hidden">
+ <div class="result"><div class="big">🏆</div><h2>Испытание пройдено!</h2><p id="resultText" style="font-size:22px"></p><button class="btn" onclick="startGame(currentGame)">Сыграть ещё раз</button> <button class="btn dark" onclick="goHome()">На главную</button></div>
+</section>
+</div>
+<footer>Учебная игра · История русского языка · Древнерусский глагол</footer>
+</div>
+<script>
+const data={
+times:{title:"Охота за временами",q:[
+["Форма «несѣхъ» — это:",["Аорист","Имперфект","Перфект","Плюсквамперфект"],0,"Это форма аориста, 1-го лица единственного числа."],
+["Какая форма обозначала длительное или повторяющееся действие в прошлом?",["Аорист","Имперфект","Перфект","Инфинитив"],1,"Имперфект передавал длительность или повторяемость действия."],
+["Какая конструкция характерна для древнерусского перфекта?",["Инфинитив + частица","Быти + причастие на -л","Только корень глагола","Деепричастие + быть"],1,"Перфект образовывался с помощью форм быти и причастия на -л."],
+["Какая форма прошедшего времени представляла действие как целостный факт?",["Аорист","Имперфект","Настоящее время","Повелительное наклонение"],0,"Аорист представлял действие как целостный факт прошлого."],
+["Как называлась форма для действия, предшествовавшего другому действию в прошлом?",["Перфект","Плюсквамперфект","Инфинитив","Сослагательное наклонение"],1,"Плюсквамперфект выражал предшествование одного прошедшего действия другому."]
+]},
+detective:{title:"Лингвистический детектив",q:[
+["Какой показатель характерен для древнерусского инфинитива?",["-ущ-","-ти","-енн-","-л"],1,"Для древнерусского инфинитива характерно окончание -ти: нести, вести, ходити."],
+["Сколько грамматических чисел различал древнерусский язык?",["Два","Три","Четыре","Одно"],1,"Единственное, двойственное и множественное."],
+["Форма «несеши» — это:",["1-е лицо ед. числа","2-е лицо ед. числа","3-е лицо ед. числа","Инфинитив"],1,"Несеши — 2-е лицо единственного числа настоящего времени."],
+["Какая форма является инфинитивом?",["ходити","ходѧ","ходихъ","ходиши"],0,"Ходити — неопределённая форма глагола."],
+["Какая категория выражает отношение действия к действительности с точки зрения говорящего?",["Род","Падеж","Наклонение","Одушевлённость"],2,"Наклонение — изъявительное, повелительное и сослагательное."]
+]},
+truth:{title:"Верю — не верю",q:[
+["В древнерусском языке существовал аорист.",["Верю","Не верю"],0,"Верно: аорист был одной из форм прошедшего времени."],
+["Древнерусский язык не имел двойственного числа.",["Верю","Не верю"],1,"Неверно: двойственное число сохранялось в древнерусской системе."],
+["Имперфект мог обозначать повторяющееся действие.",["Верю","Не верю"],0,"Верно: повторяемость и длительность — типичные значения имперфекта."],
+["Перфект связан с причастием на -л.",["Верю","Не верю"],0,"Верно: причастие на -л входило в состав древнерусского перфекта."],
+["Инфинитив — это личная форма глагола.",["Верю","Не верю"],1,"Неверно: инфинитив — неопределённая, неличная форма."]
+]}
+};
+let currentGame="times",index=0,score=0,chosen=null,answered=false,totalScore=0,teamScores=[0,0],sound=false,audioCtx=null;
+function show(id){document.querySelectorAll('.shell>section').forEach(s=>s.classList.add('hidden'));document.getElementById(id).classList.remove('hidden')}
+function goHome(){show('home')}
+function startGame(id){currentGame=id;index=0;score=0;chosen=null;answered=false;show('play');render()}
+function render(){let game=data[currentGame],q=game.q[index];document.getElementById('gameLabel').textContent="ИСТОРИЧЕСКИЙ КВЕСТ · УРОВЕНЬ "+(Object.keys(data).indexOf(currentGame)+1);document.getElementById('gameTitle').textContent=game.title;document.getElementById('scoreNow').textContent="Баллы: "+score;document.getElementById('counter').textContent=`Вопрос ${index+1} из ${game.q.length}`;document.getElementById('bar').style.width=(index/game.q.length*100)+"%";document.getElementById('question').textContent=q[0];document.getElementById('feedback').classList.add('hidden');document.getElementById('nextBtn').disabled=true;document.getElementById('nextBtn').textContent="Ответить / Далее →";document.getElementById('options').innerHTML="";q[1].forEach((v,i)=>{let b=document.createElement('button');b.className='option';b.textContent=String.fromCharCode(65+i)+". "+v;b.onclick=()=>select(i);document.getElementById('options').appendChild(b)})}
+function select(i){if(answered)return;chosen=i;document.querySelectorAll('.option').forEach((b,j)=>b.classList.toggle('selected',j===i));document.getElementById('nextBtn').disabled=false}
+function selectSound(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();let o=audioCtx.createOscillator(),g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.frequency.value= sound?660:220;g.gain.value=.07;o.start();o.stop(audioCtx.currentTime+.12)}
+function toggleSound(){sound=!sound;document.getElementById('soundBtn').textContent="♫ Звук: "+(sound?"вкл.":"выкл.");if(sound)selectSound()}
+function nextQuestion(){let game=data[currentGame],q=game.q[index];if(!answered){answered=true;let correct=chosen===q[2];if(correct)score++;document.querySelectorAll('.option').forEach((b,j)=>{b.disabled=true;if(j===q[2])b.classList.add('correct');else if(j===chosen)b.classList.add('wrong')});let f=document.getElementById('feedback');f.classList.remove('hidden');f.innerHTML=(correct?"<b>✓ Верно! +1 балл.</b> ":"<b>✕ Ответ неверный.</b> Правильный ответ: <b>"+q[1][q[2]]+".</b> ")+q[3];document.getElementById('scoreNow').textContent="Баллы: "+score;document.getElementById('nextBtn').textContent=index===game.q.length-1?"Завершить раунд":"Следующий вопрос →";if(sound)selectSound();return}if(index<game.q.length-1){index++;chosen=null;answered=false;render()}else{totalScore+=score;document.getElementById('resultText').textContent=`Твой результат: ${score} из ${game.q.length} баллов. ${score===game.q.length?"Безупречно!":score>=3?"Отличная работа!":"Повтори памятку и попробуй ещё раз."}`;document.getElementById('finalScore').textContent="Последний результат: "+score+" баллов.";show('finish')}}
+function toggleProjector(){document.body.classList.toggle('projector');if(!document.fullscreenElement){document.documentElement.requestFullscreen?.()}else{document.exitFullscreen?.()}}
+function updateTeams(){document.getElementById('name1').textContent=document.getElementById('team1').value||"Команда 1";document.getElementById('name2').textContent=document.getElementById('team2').value||"Команда 2"}
+function addTeam(n){teamScores[n-1]++;document.getElementById('points'+n).textContent=teamScores[n-1]}
+function resetTeams(){teamScores=[0,0];document.getElementById('points1').textContent=0;document.getElementById('points2').textContent=0}
+</script>
+</body>
+</html>
